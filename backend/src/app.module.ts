@@ -6,12 +6,24 @@ import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      process.env.MONGODB_URI || 'mongodb://localhost/email-esp-check',
-    ),
+    MongooseModule.forRoot(process.env.MONGODB_URI || '', {
+      connectionFactory: (connection) => {
+        connection.on('connected', () => {
+          console.log('✅ Connected to MongoDB Atlas successfully!');
+        });
+        connection.on('error', (err) => {
+          console.error('❌ MongoDB Connection Error:', err);
+        });
+        return connection;
+      },
+    }),
     EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log('✅ AppModule initialized');
+  }
+}
